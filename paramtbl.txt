@@ -1,5 +1,10 @@
 name	default	smooth
 time:rate	.5	0
 time:run	1	0
-path:step_rate	.5	1
+path:step_rate	.5	0
 path:step_run	1	0
+path:filter_rate	.3	0
+post:echo_level	.1	1
+post:echo_length	.2	1
+post:bloom_amount	.3	1
+post:bloom_distance	.4	1
