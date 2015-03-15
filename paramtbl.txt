@@ -9,3 +9,4 @@ post:echo_length	.2	1
 post:bloom_amount	.3	1
 post:bloom_distance	.4	1
 path:divisions	0	0
+cam:position	0	1
