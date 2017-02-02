@@ -1,2 +1,3 @@
-path2-output-*.*
 CrashAutoSave.toe
+*.dmp
+*-output-*.*
