@@ -20,6 +20,7 @@ if False:
 		from common.lib._stubs import *
 
 import random
+import numpy
 
 class StepGen(base.Extension):
 	def __init__(self, comp):
@@ -81,19 +82,43 @@ class StepGen(base.Extension):
 
 	def _GetRandomStep(self):
 		direction = random.randrange(self._StepVals.numSamples)
+		return self._GetStep(direction)
+
+	def _GetStep(self, index):
+		index = numpy.clip(index, 0, self._StepVals.numSamples - 1)
 		return tdu.Vector(
-			self._StepVals['x'][direction],
-			self._StepVals['y'][direction],
-			self._StepVals['z'][direction],
+			self._StepVals['x'][index],
+			self._StepVals['y'][index],
+			self._StepVals['z'][index],
 		)
 
-	def _ChooseDirection(self):
+	@property
+	def _Steps(self):
+		return [self._GetStep(i) for i in range(self._StepVals.numSamples)]
+
+	def _GetNextStep(self):
 		if not self._ShouldGoToTarget:
 			return self._GetRandomStep()
-		else:
-			raise NotImplementedError()
+		pos = self.Position
+		targetpos = self._TargetPosition
+		currentdist = (targetpos - pos).length()
+		if self.comp.par.Stayattarget and currentdist <= self.comp.par.Targetradius:
+			# self._LogEvent('_GetNextStep() - stopped near target')
+			return None
+		# self._LogEvent('_GetNextStep() - seeking target %r' % targetpos)
+		steps = self._Steps
+		random.shuffle(steps)
+		for step in steps:
+			newpos = pos + step
+			newdist = (targetpos - newpos).length()
+			if newdist <= currentdist:
+				# self._LogEvent('_GetNextStep() - selecting step %r since it would move closer to target' % step)
+				return step
+		# self._LogEvent('_GetNextStep() - no steps would move closer to target, using random step')
+		return steps[0]
 
-	def Step(self):
-		step = self._ChooseDirection()
-		self.TakeStep(step)
+	def TakeNextStep(self):
+		step = self._GetNextStep()
+		if step is not None:
+			self.TakeStep(step)
 
