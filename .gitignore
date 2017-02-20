@@ -1,3 +1,5 @@
 CrashAutoSave.toe
 *.dmp
 *-output-*.*
+*-package-*.zip
+.idea/
